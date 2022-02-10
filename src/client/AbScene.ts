@@ -89,6 +89,7 @@ export class AbScene {
     this.grid = new THREE.GridHelper(20, 20);
     this.scene.add(this.grid);
     this.axes = new THREE.AxesHelper(1);
+    this.scene.add(this.axes);
     this.primitives = [];
   }
 
