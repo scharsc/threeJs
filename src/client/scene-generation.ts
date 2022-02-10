@@ -49,10 +49,9 @@ export function createCylinder(
   orientation.lookAt(point1, point2, new THREE.Vector3(0, 1, 0)); //look at destination
   orientation = orientation.multiply(
     new THREE.Matrix4().makeRotationX(HALF_PI)
-  ); //rotate 90 degs on X
+  ); 
   var offsetPosition = new THREE.Matrix4().identity();
   offsetPosition.setPosition(point2.add(diff.multiplyScalar(0.5))); //move by pivot offset on Y
-
   geometry.applyMatrix4(orientation); //apply the final matrix
   const material = new THREE.MeshLambertMaterial({ color: 0x0000ff });
   return new THREE.Mesh(geometry, material);

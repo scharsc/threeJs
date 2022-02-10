@@ -5,9 +5,9 @@ import { generateScene } from "./scene-generation";
 
 const scene = generateScene();
 
-const light = new THREE.PointLight(0xffffff, 2)
-light.position.set(10, 10, 10)
-scene.add(light)
+const light = new THREE.PointLight(0xffffff, 2);
+light.position.set(10, 10, 10);
+scene.add(light);
 
 const camera = new THREE.PerspectiveCamera(
   75,
@@ -15,15 +15,18 @@ const camera = new THREE.PerspectiveCamera(
   0.1,
   1000
 );
+
 camera.position.z = 2;
 
-const renderer = new THREE.WebGLRenderer();
+const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setClearColor(new THREE.Color(0x222222));
 document.body.appendChild(renderer.domElement);
 
 new OrbitControls(camera, renderer.domElement);
 
 window.addEventListener("resize", onWindowResize, false);
+
 function onWindowResize() {
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
