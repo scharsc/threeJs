@@ -1,23 +1,18 @@
 import * as THREE from "three";
+import { LineSegments } from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+import Stats from "three/examples/jsm/libs/stats.module";
+import { AbSphere } from "./AbSphere";
+import { AbLineSegment, AbScene, AbCylinderFinite } from "./AbScene";
 
-import { AbScene } from "./AbScene";
-
-export class AbView {
-  renderer: THREE.WebGLRenderer;
-  controls: OrbitControls;
-  camera: THREE.PerspectiveCamera;
-  scene: AbScene;
-  htmlElement: HTMLElement;
-
+export class AbApplication {
   constructor(
-    scene: AbScene,
     htmlElement: HTMLElement = document.body,
     cameraPosition = new THREE.Vector3(10, 10, 10),
     cameraTarget = new THREE.Vector3(0, 0, 0)
   ) {
-    this.htmlElement = htmlElement;
-    this.scene = scene;
+    this.scene = new AbScene();
+    // setup camera
     this.camera = new THREE.PerspectiveCamera(
       75,
       window.innerWidth / window.innerHeight,
@@ -32,54 +27,98 @@ export class AbView {
     );
     this.camera.lookAt(cameraTarget);
 
-    this.renderer = new THREE.WebGLRenderer({ antialias: true });
+    // setup up renderer
+    this.htmlElement = htmlElement;
+    this.renderer = new THREE.WebGLRenderer({
+      antialias: true,
+      powerPreference: "high-performance",
+    });
     this.renderer.setSize(window.innerWidth, window.innerHeight);
-    this.renderer.setClearColor(new THREE.Color(0x222222));
     this.renderer.setPixelRatio(window.devicePixelRatio);
-    htmlElement.appendChild(this.renderer.domElement);
+    this.renderer.physicallyCorrectLights = true;
+    this.renderer.shadowMap.enabled = true;
+    this.renderer.outputEncoding = THREE.sRGBEncoding;
+    this.htmlElement.appendChild(this.renderer.domElement);
+
+    window.addEventListener("resize", this.onWindowResize.bind(this), false);
+    document.addEventListener("mousedown", this.onMouseDown.bind(this));
 
     this.controls = new OrbitControls(this.camera, this.renderer.domElement);
-    htmlElement.addEventListener(
-      "resize",
-      this.onWindowResize.bind(this),
-      false
+    this.controls.enableDamping = true;
+    this.controls.dampingFactor = 0.25;
+
+    this.stats = Stats();
+    this.htmlElement.appendChild(this.stats.dom);
+  }
+
+  createRandomScene(count: number = 5000) {
+    for (var i = 0; i < count; ++i) {
+      this.scene.addPrimitive(
+        new AbSphere(
+          new THREE.Vector3(
+            (Math.random() - 0.5) * 10,
+            (Math.random() - 0.0) * 10,
+            (Math.random() - 0.5) * 10
+          ),
+          Math.random() * 0.5 + 0.1
+        )
+      );
+    }
+  }
+
+  createRandomScene2() {
+    this.scene.addPrimitive(
+      new AbCylinderFinite(
+        new AbLineSegment(
+          new THREE.Vector3(0, 0, 0),
+          new THREE.Vector3(1, 1, 1)
+        ),
+        0.1
+      )
     );
   }
 
-  onWindowResize() {
-    this.camera.aspect =
-      this.htmlElement.offsetWidth / this.htmlElement.offsetHeight;
-    this.camera.updateProjectionMatrix();
-    this.renderer.setSize(
-      this.htmlElement.offsetWidth,
-      this.htmlElement.offsetHeight
-    );
+  animate() {
+    requestAnimationFrame(this.animate.bind(this));
+    this.controls.update();
     this.render();
+    this.stats.update();
   }
 
   render() {
     this.renderer.render(this.scene.scene, this.camera);
   }
-}
 
-export class AbApplication {
-  constructor() {}
-
-  addView(htmlElement: HTMLElement) {
-    this.views.push(new AbView(this.scene, htmlElement));
-  }
-
-  animate() {
-    requestAnimationFrame(this.animate.bind(this));
+  onWindowResize(): void {
+    this.camera.aspect = window.innerWidth / window.innerHeight;
+    this.camera.updateProjectionMatrix();
+    this.renderer.setSize(window.innerWidth, window.innerHeight);
     this.render();
   }
 
-  render() {
-    for (var view of this.views) {
-      view.render();
-    }
+  onMouseDown(event: MouseEvent): void {
+    event.preventDefault();
+    var mouse3D = new THREE.Vector3(
+      (event.clientX / window.innerWidth) * 2 - 1,
+      -(event.clientY / window.innerHeight) * 2 + 1
+    );
+
+    this.raycaster.setFromCamera(mouse3D, this.camera);
+    //var intersects = this.raycaster.intersectObjects(this.scene.objects);
+    //console.log(intersects);
+    //if (intersects.length > 0) {
+
+    //      intersects[0].select();
+    //   }
   }
 
-  scene: AbScene = new AbScene();
-  views: AbView[] = [];
+  raycaster: THREE.Raycaster = new THREE.Raycaster();
+
+  scene: AbScene;
+  renderer: THREE.WebGLRenderer;
+  camera: THREE.PerspectiveCamera;
+  controls: OrbitControls;
+  htmlElement: HTMLElement;
+
+  stats: Stats;
 }

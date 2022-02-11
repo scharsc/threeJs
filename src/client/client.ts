@@ -1,7 +1,5 @@
+import { AbApplication } from "./AbApplication";
 
-import { AbApplication, AbView } from "./AbApplication";
-
-const app = new AbApplication();
-app.addView(document.body);
-
+const app = new AbApplication(document.body);
+app.createRandomScene2();
 app.animate();
