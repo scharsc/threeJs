@@ -1,3 +1,5 @@
 node_modules
 dist/client/*.js
+dist/client/*.LICENSE.txt
 dist/server/*.js
+dist/server/*.LICENSE.txt
