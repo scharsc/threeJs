@@ -1,9 +1,55 @@
 import * as THREE from "three";
-import { LineSegments } from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import Stats from "three/examples/jsm/libs/stats.module";
 import { AbSphere } from "./AbSphere";
-import { AbLineSegment, AbScene, AbCylinderFinite } from "./AbScene";
+import { AbCylinderFinite } from "./AbCylinderFinite";
+import { AbScene } from "./AbScene";
+import {AbLineSegment} from "./AbLineSegment";
+
+
+function randomPoint(pMin:THREE.Vector3=new THREE.Vector3(-1,-1,-1), pMax:THREE.Vector3=new THREE.Vector3(1,1,1))
+{
+  const delta = pMax.clone().sub(pMin);
+  return new THREE.Vector3(
+    Math.random() * delta.x,
+    Math.random() * delta.y,
+    Math.random() * delta.z
+  ).add(pMin);
+}
+
+function randomUniform(a:number=0, b:number=1)
+{
+  return a + Math.random()*(b-a);
+}
+
+function randomLineSegment(
+  pMin:THREE.Vector3=new THREE.Vector3(-1,-1,-1),
+  pMax:THREE.Vector3=new THREE.Vector3(1,1,1),
+ )
+{
+  return new AbLineSegment(randomPoint(pMin,pMax), randomPoint(pMin,pMax));
+}
+
+
+function randomCylinderFinite(radiusMin:number=.01, radiusMax:number=1,
+  pMin:THREE.Vector3=new THREE.Vector3(-1,-1,-1),
+pMax:THREE.Vector3=new THREE.Vector3(1,1,1))
+{
+  return new AbCylinderFinite(
+    randomLineSegment(pMin,pMax),
+    randomUniform(radiusMin,radiusMax)
+  );
+}
+
+function randomSphere(radiusMin:number=.01, radiusMax:number=1,  
+  pMin:THREE.Vector3=new THREE.Vector3(-1,-1,-1),
+ pMax:THREE.Vector3=new THREE.Vector3(1,1,1))
+{
+  return new AbSphere(
+    randomPoint(pMin,pMax),
+    randomUniform(radiusMin, radiusMax)
+  )
+}
 
 export class AbApplication {
   constructor(
@@ -51,41 +97,17 @@ export class AbApplication {
     this.htmlElement.appendChild(this.stats.dom);
   }
 
+
   createRandomScene(count: number = 5000) {
     for (var i = 0; i < count; ++i) {
-      this.scene.addPrimitive(
-        new AbSphere(
-          new THREE.Vector3(
-            (Math.random() - 0.5) * 10,
-            (Math.random() - 0.0) * 10,
-            (Math.random() - 0.5) * 10
-          ),
-          Math.random() * 0.5 + 0.1
-        )
-      );
+      this.scene.addPrimitive(randomSphere(0.1,0.20,new THREE.Vector3(-5,0,-5), new THREE.Vector3(5,2.5,5)));
     }
   }
 
-  createRandomScene2() {
-    this.scene.addPrimitive(
-      new AbCylinderFinite(
-        new AbLineSegment(
-          new THREE.Vector3(0, 0, 0),
-          new THREE.Vector3(1, 1, 1)
-        ),
-        0.1
-      )
-    );
-
-    this.scene.addPrimitive(
-      new AbCylinderFinite(
-        new AbLineSegment(
-          new THREE.Vector3(1, 1, 1),
-          new THREE.Vector3(2, 2, 1)
-        ),
-        0.1
-      )
-    );
+  createRandomScene2(count: number = 5000) {
+    for (var i = 0; i < count; ++i) {
+      this.scene.addPrimitive(randomCylinderFinite(0.1,0.2,new THREE.Vector3(-5,2.5,-5), new THREE.Vector3(5,5,5)));
+    }
   }
 
   animate() {
