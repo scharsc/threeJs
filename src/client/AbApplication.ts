@@ -76,6 +76,16 @@ export class AbApplication {
         0.1
       )
     );
+
+    this.scene.addPrimitive(
+      new AbCylinderFinite(
+        new AbLineSegment(
+          new THREE.Vector3(1, 1, 1),
+          new THREE.Vector3(2, 2, 1)
+        ),
+        0.1
+      )
+    );
   }
 
   animate() {
