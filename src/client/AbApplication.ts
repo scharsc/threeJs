@@ -109,6 +109,10 @@ export class AbApplication {
       this.scene.addPrimitive(randomCylinderFinite(0.1,0.2,new THREE.Vector3(-5,2.5,-5), new THREE.Vector3(5,5,5)));
     }
   }
+  createScene3()
+  {
+    
+  }
 
   animate() {
     requestAnimationFrame(this.animate.bind(this));

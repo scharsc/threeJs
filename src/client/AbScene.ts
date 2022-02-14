@@ -23,21 +23,6 @@ export class AbBounds3dCs extends THREE.Object3D implements AbPrimitive {
   }
 }
 
-export class AbRegion {
-  constructor(
-    public boundary: THREE.Path = new THREE.Path(),
-    public holes: THREE.Path[] = []
-  ) {}
-}
-
-export class AbRegion3d extends THREE.Object3D implements AbPrimitive {
-  constructor(
-    public localRegion: AbRegion = new AbRegion() //public localToWorld: THREE.Matrix4 = new THREE.Matrix4()
-  ) {
-    super();
-  }
-}
-
 export class AbScene {
   constructor(
     background: null | THREE.Color | THREE.Texture = new THREE.Color(0xffffff)
