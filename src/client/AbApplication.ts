@@ -4,11 +4,14 @@ import Stats from "three/examples/jsm/libs/stats.module";
 import { AbSphere } from "./AbSphere";
 import { AbCylinderFinite } from "./AbCylinderFinite";
 import { AbScene } from "./AbScene";
-import {AbLineSegment} from "./AbLineSegment";
+import { AbLineSegment } from "./AbLineSegment";
+import { AbRegion } from "./AbRegion";
+import { AbPointCloud } from "./AbPointCloud";
 
-
-function randomPoint(pMin:THREE.Vector3=new THREE.Vector3(-1,-1,-1), pMax:THREE.Vector3=new THREE.Vector3(1,1,1))
-{
+function randomPoint(
+  pMin: THREE.Vector3 = new THREE.Vector3(-1, -1, -1),
+  pMax: THREE.Vector3 = new THREE.Vector3(1, 1, 1)
+) {
   const delta = pMax.clone().sub(pMin);
   return new THREE.Vector3(
     Math.random() * delta.x,
@@ -17,38 +20,39 @@ function randomPoint(pMin:THREE.Vector3=new THREE.Vector3(-1,-1,-1), pMax:THREE.
   ).add(pMin);
 }
 
-function randomUniform(a:number=0, b:number=1)
-{
-  return a + Math.random()*(b-a);
+function randomUniform(a: number = 0, b: number = 1) {
+  return a + Math.random() * (b - a);
 }
 
 function randomLineSegment(
-  pMin:THREE.Vector3=new THREE.Vector3(-1,-1,-1),
-  pMax:THREE.Vector3=new THREE.Vector3(1,1,1),
- )
-{
-  return new AbLineSegment(randomPoint(pMin,pMax), randomPoint(pMin,pMax));
+  pMin: THREE.Vector3 = new THREE.Vector3(-1, -1, -1),
+  pMax: THREE.Vector3 = new THREE.Vector3(1, 1, 1)
+) {
+  return new AbLineSegment(randomPoint(pMin, pMax), randomPoint(pMin, pMax));
 }
 
-
-function randomCylinderFinite(radiusMin:number=.01, radiusMax:number=1,
-  pMin:THREE.Vector3=new THREE.Vector3(-1,-1,-1),
-pMax:THREE.Vector3=new THREE.Vector3(1,1,1))
-{
+function randomCylinderFinite(
+  radiusMin: number = 0.01,
+  radiusMax: number = 1,
+  pMin: THREE.Vector3 = new THREE.Vector3(-1, -1, -1),
+  pMax: THREE.Vector3 = new THREE.Vector3(1, 1, 1)
+) {
   return new AbCylinderFinite(
-    randomLineSegment(pMin,pMax),
-    randomUniform(radiusMin,radiusMax)
+    randomLineSegment(pMin, pMax),
+    randomUniform(radiusMin, radiusMax)
   );
 }
 
-function randomSphere(radiusMin:number=.01, radiusMax:number=1,  
-  pMin:THREE.Vector3=new THREE.Vector3(-1,-1,-1),
- pMax:THREE.Vector3=new THREE.Vector3(1,1,1))
-{
+function randomSphere(
+  radiusMin: number = 0.01,
+  radiusMax: number = 1,
+  pMin: THREE.Vector3 = new THREE.Vector3(-1, -1, -1),
+  pMax: THREE.Vector3 = new THREE.Vector3(1, 1, 1)
+) {
   return new AbSphere(
-    randomPoint(pMin,pMax),
+    randomPoint(pMin, pMax),
     randomUniform(radiusMin, radiusMax)
-  )
+  );
 }
 
 export class AbApplication {
@@ -97,21 +101,70 @@ export class AbApplication {
     this.htmlElement.appendChild(this.stats.dom);
   }
 
-
   createRandomScene(count: number = 5000) {
     for (var i = 0; i < count; ++i) {
-      this.scene.addPrimitive(randomSphere(0.1,0.20,new THREE.Vector3(-5,0,-5), new THREE.Vector3(5,2.5,5)));
+      this.scene.addPrimitive(
+        randomSphere(
+          0.1,
+          0.2,
+          new THREE.Vector3(-5, 0, -5),
+          new THREE.Vector3(5, 2.5, 5)
+        )
+      );
     }
   }
 
   createRandomScene2(count: number = 5000) {
     for (var i = 0; i < count; ++i) {
-      this.scene.addPrimitive(randomCylinderFinite(0.1,0.2,new THREE.Vector3(-5,2.5,-5), new THREE.Vector3(5,5,5)));
+      this.scene.addPrimitive(
+        randomCylinderFinite(
+          0.1,
+          0.2,
+          new THREE.Vector3(-5, 2.5, -5),
+          new THREE.Vector3(5, 5, 5)
+        )
+      );
     }
   }
-  createScene3()
-  {
-    
+
+  createScene3() {
+    const boundaryPoints = [
+      new THREE.Vector2(0, 0),
+      new THREE.Vector2(1, 0),
+      new THREE.Vector2(1, 1),
+      new THREE.Vector2(0, 1),
+    ];
+
+    const hole = [
+      new THREE.Vector2(0.1, 0.1),
+      new THREE.Vector2(0.9, 0.1),
+      new THREE.Vector2(0.9, 0.9),
+      new THREE.Vector2(0.1, 0.9),
+    ];
+
+    const region = new AbRegion(boundaryPoints, [hole]);
+    region.translateX(10);
+    this.scene.addPrimitive(region);
+  }
+
+  createRandomPointCloud(numPoints: number = 100000, pointSize: number = 0.1) {
+    const positions = [];
+    const colors = [];
+    const color = new THREE.Color();
+
+    for (let i = 0; i < numPoints; i++) {
+      // positions
+      const x = randomUniform(-10, 10);
+      const y = randomUniform(-10, 10);
+      const z = randomUniform(-10, 10);
+      positions.push(x, y, z);
+
+      // colors
+      color.setRGB(Math.random(), Math.random(), Math.random());
+      colors.push(color.r, color.g, color.b);
+    }
+    const pc = new AbPointCloud(pointSize, positions, [], colors);
+    this.scene.addPrimitive(pc);
   }
 
   animate() {
@@ -140,7 +193,8 @@ export class AbApplication {
     );
 
     this.raycaster.setFromCamera(mouse3D, this.camera);
-    //var intersects = this.raycaster.intersectObjects(this.scene.objects);
+
+    //var intersects = this.raycaster.intersectObjects(this.scene.scene,true);
     //console.log(intersects);
     //if (intersects.length > 0) {
 
