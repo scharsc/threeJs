@@ -21,12 +21,12 @@ export class AbCylinderFinite extends THREE.Object3D implements AbPrimitive {
   }
 
   set axis(value: AbLineSegment) {
-    this.mesh.scale.set(this.radius_, value.height, this.radius_);
+    this.axis_ = value;
+    this.mesh.scale.set(this.radius_, this.axis_.height, this.radius_);
     const delta = value.start.clone().sub(value.end).normalize();
     const zAxis = new THREE.Vector3(0, 1, 0);
     const dir = zAxis.clone().cross(delta).normalize();
     this.mesh.setRotationFromAxisAngle(dir, zAxis.angleTo(delta));
-    this.axis_ = value;
   }
 
   get axis() {
@@ -34,6 +34,7 @@ export class AbCylinderFinite extends THREE.Object3D implements AbPrimitive {
   }
 
   set radius(value: number) {
+    this.mesh.scale.set(this.radius_, this.axis_.height, this.radius_);
     this.radius_ = value;
   }
 
