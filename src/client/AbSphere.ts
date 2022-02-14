@@ -7,7 +7,9 @@ export class AbSphere extends THREE.Object3D implements AbPrimitive {
     radius: number = 1
   ) {
     super();
-    this.material = new THREE.MeshLambertMaterial({ color: "rgb(255, 0, 0)" });
+    this.material = new THREE.MeshLambertMaterial({
+      color: "rgb(255, 0, 0)",
+    });
     this.mesh = new THREE.Mesh(AbSphere.geometry, this.material);
     this.mesh.position.copy(center);
     this.radius_ = radius;
