@@ -2,10 +2,6 @@ import * as THREE from "three";
 import { AbAxesHelper } from "./AbAxesHelper";
 import { AbPrimitive } from "./AbPrimitive";
 
-
-
-
-
 export class AbScene {
   constructor(
     background: null | THREE.Color | THREE.Texture = new THREE.Color(0xffffff)
@@ -33,5 +29,3 @@ export class AbScene {
   public axes: AbAxesHelper;
   public primitives: AbPrimitive[];
 }
-
-

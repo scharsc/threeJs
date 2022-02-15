@@ -7,10 +7,12 @@ export class AbSphere extends THREE.Object3D implements AbPrimitive {
     radius: number = 1
   ) {
     super();
-    this.material = new THREE.MeshLambertMaterial({
-      color: "rgb(255, 0, 0)",
-    });
-    this.mesh = new THREE.Mesh(AbSphere.geometry, this.material);
+    this.mesh = new THREE.Mesh(
+      AbSphere.geometry,
+      new THREE.MeshLambertMaterial({
+        color: "rgb(255, 0, 0)",
+      })
+    );
     this.center_ = center;
     this.radius_ = radius;
     this.updateMesh();
@@ -22,7 +24,7 @@ export class AbSphere extends THREE.Object3D implements AbPrimitive {
   }
 
   set center(value: THREE.Vector3) {
-    this.center_ =value;
+    this.center_ = value;
     this.updateMesh();
   }
 
@@ -35,8 +37,7 @@ export class AbSphere extends THREE.Object3D implements AbPrimitive {
     this.updateMesh();
   }
 
-  private updateMesh()
-  {
+  private updateMesh() {
     this.mesh.position.copy(this.center_);
     this.mesh.scale.set(this.radius_, this.radius_, this.radius_);
   }
@@ -46,7 +47,6 @@ export class AbSphere extends THREE.Object3D implements AbPrimitive {
     3
   );
 
-  material: THREE.MeshLambertMaterial;
   mesh: THREE.Mesh;
   private radius_: number;
   private center_: THREE.Vector3;
