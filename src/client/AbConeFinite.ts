@@ -54,7 +54,10 @@ export class AbConeFinite extends THREE.Object3D implements AbPrimitive {
     this.mesh.geometry = new THREE.CylinderGeometry(
       this.radiusTop_,
       this.radiusBottom_,
-      this.axis_.length
+      this.axis_.length,
+      15,
+      1,
+      true
     );
 
     this.mesh.position.copy(this.axis_.center);

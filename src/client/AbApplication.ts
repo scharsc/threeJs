@@ -7,6 +7,9 @@ import { AbScene } from "./AbScene";
 import { AbLineSegment } from "./AbLineSegment";
 import { AbRegion } from "./AbRegion";
 import { AbPointCloud } from "./AbPointCloud";
+import { AbConeFinite } from "./AbConeFinite";
+import { AbBoundsCs } from "./AbBoundsCs";
+import { AbBounds } from "./AbBounds";
 
 function randomPoint(
   pMin: THREE.Vector3 = new THREE.Vector3(-1, -1, -1),
@@ -24,6 +27,67 @@ function randomUniform(a: number = 0, b: number = 1) {
   return a + Math.random() * (b - a);
 }
 
+function randomNormal(mu: number = 0, sigma: number = 1) {
+  var u = 0,
+    v = 0;
+  while (u === 0) u = Math.random();
+  while (v === 0) v = Math.random();
+  var x = Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
+  return mu + x * sigma;
+}
+
+function randomDirection() {
+  return new THREE.Vector3(
+    randomNormal(),
+    randomNormal(),
+    randomNormal()
+  ).normalize();
+}
+
+function randomRigidTrafo(
+  pMin: THREE.Vector3 = new THREE.Vector3(-1, -1, -1),
+  pMax: THREE.Vector3 = new THREE.Vector3(1, 1, 1)
+) {
+  let trafo = new THREE.Matrix4().makeTranslation(
+    randomUniform(pMin.x, pMax.x),
+    randomUniform(pMin.y, pMax.y),
+    randomUniform(pMin.z, pMax.z)
+  );
+  return trafo.multiply(
+    new THREE.Matrix4().makeRotationAxis(
+      randomDirection(),
+      randomUniform(0, 2 * Math.PI)
+    )
+  );
+}
+
+function randomBounds(
+  pMin: THREE.Vector3 = new THREE.Vector3(-1, -1, -1),
+  pMax: THREE.Vector3 = new THREE.Vector3(1, 1, 1),
+  scaleRange: THREE.Vector3 = new THREE.Vector3(1, 1, 1)
+) {
+  let halfScale = scaleRange.clone().multiplyScalar(0.5);
+  let center = randomPoint(
+    pMin.clone().add(halfScale),
+    pMax.clone().sub(halfScale)
+  );
+  let halfExtent = randomPoint(new THREE.Vector3(0, 0, 0), halfScale);
+  let p1 = new THREE.Vector3().subVectors(center, halfExtent);
+  let p2 = new THREE.Vector3().addVectors(center, halfExtent);
+
+  return new AbBounds(p1, p2);
+}
+
+function randomBoundsCs(
+  pMin: THREE.Vector3 = new THREE.Vector3(-1, -1, -1),
+  pMax: THREE.Vector3 = new THREE.Vector3(1, 1, 1)
+) {
+  return new AbBoundsCs(
+    randomBounds(new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 0, 0)),
+    randomRigidTrafo(pMin, pMax)
+  );
+}
+
 function randomLineSegment(
   pMin: THREE.Vector3 = new THREE.Vector3(-1, -1, -1),
   pMax: THREE.Vector3 = new THREE.Vector3(1, 1, 1)
@@ -39,6 +103,19 @@ function randomCylinderFinite(
 ) {
   return new AbCylinderFinite(
     randomLineSegment(pMin, pMax),
+    randomUniform(radiusMin, radiusMax)
+  );
+}
+
+function randomConeFinite(
+  radiusMin: number = 0.01,
+  radiusMax: number = 1,
+  pMin: THREE.Vector3 = new THREE.Vector3(-1, -1, -1),
+  pMax: THREE.Vector3 = new THREE.Vector3(1, 1, 1)
+) {
+  return new AbConeFinite(
+    randomLineSegment(pMin, pMax),
+    1.0,
     randomUniform(radiusMin, radiusMax)
   );
 }
@@ -101,7 +178,7 @@ export class AbApplication {
     this.htmlElement.appendChild(this.stats.dom);
   }
 
-  createRandomScene(count: number = 5000) {
+  createRandomSpheres(count: number = 5000) {
     for (var i = 0; i < count; ++i) {
       this.scene.addPrimitive(
         randomSphere(
@@ -114,7 +191,7 @@ export class AbApplication {
     }
   }
 
-  createRandomScene2(count: number = 5000) {
+  createRandomCylinders(count: number = 5000) {
     for (var i = 0; i < count; ++i) {
       this.scene.addPrimitive(
         randomCylinderFinite(
@@ -127,7 +204,29 @@ export class AbApplication {
     }
   }
 
-  createScene3() {
+  createRandomBounds(count: number = 5000) {
+    for (var i = 0; i < count; ++i) {
+      this.scene.addPrimitive(
+        randomBounds(
+          new THREE.Vector3(-5, 5, -5),
+          new THREE.Vector3(5, 7.25, 5)
+        )
+      );
+    }
+  }
+
+  createRandomBoundsCs(count: number = 5000) {
+    for (var i = 0; i < count; ++i) {
+      this.scene.addPrimitive(
+        randomBoundsCs(
+          new THREE.Vector3(-5, 10.0, -5),
+          new THREE.Vector3(5, 12.5, 5)
+        )
+      );
+    }
+  }
+
+  createRegions() {
     const boundaryPoints = [
       new THREE.Vector2(0, 0),
       new THREE.Vector2(1, 0),
@@ -147,9 +246,24 @@ export class AbApplication {
     this.scene.addPrimitive(region);
   }
 
+  createRandomCones(count: number = 500) {
+    for (var i = 0; i < count; ++i) {
+      this.scene.addPrimitive(
+        randomConeFinite(
+          0.1,
+          0.2,
+          new THREE.Vector3(-5, 7.5, -5),
+          new THREE.Vector3(5, 10, 5)
+        )
+      );
+    }
+  }
+
   createRandomPointCloud(numPoints: number = 100000, pointSize: number = 0.1) {
-    const positions = [];
-    const colors = [];
+    const positions: number[] = [];
+    const colors: number[] = [];
+    const normals: number[] = [];
+
     const color = new THREE.Color();
 
     for (let i = 0; i < numPoints; i++) {
@@ -158,6 +272,13 @@ export class AbApplication {
       const y = randomUniform(-10, 10);
       const z = randomUniform(-10, 10);
       positions.push(x, y, z);
+
+      // normals
+      const nx = randomNormal();
+      const ny = randomNormal();
+      const nz = randomNormal();
+      const l = 1.0 / Math.sqrt(nx * nx + ny * ny + nz * nz);
+      normals.push(l * nx, l * ny, l * nz);
 
       // colors
       color.setRGB(Math.random(), Math.random(), Math.random());

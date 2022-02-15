@@ -33,5 +33,14 @@ export class AbRegion extends THREE.Object3D implements AbPrimitive {
     }
   }
 
+  get lcsToWcs() {
+    return this.mesh.matrix;
+  }
+
+  set lcsToWcs(lcsToWcs: THREE.Matrix4) {
+    this.mesh.matrix.copy(lcsToWcs);
+    this.matrixWorldNeedsUpdate = true;
+  }
+
   mesh: THREE.Mesh;
 }

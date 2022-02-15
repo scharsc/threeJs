@@ -1,4 +1,4 @@
 {
   "editor.formatOnSave": true,
-  "cSpell.words": ["raycaster", "wireframe", "lerp"]
+  "cSpell.words": ["raycaster", "wireframe", "lerp", "trafo"]
 }

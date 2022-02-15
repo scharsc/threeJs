@@ -8,11 +8,12 @@ export class AbBoundsCs extends THREE.Object3D implements AbPrimitive {
     lcsToWcs: THREE.Matrix4 | undefined
   ) {
     super();
-    this.add(this.localBounds.mesh);
-    this.localBounds.matrixAutoUpdate = false;
+
     if (lcsToWcs) {
+      this.localBounds.matrixAutoUpdate = false;
       this.lcsToWcs = lcsToWcs;
     }
+    this.add(this.localBounds);
   }
 
   get lcsToWcs() {
@@ -21,6 +22,6 @@ export class AbBoundsCs extends THREE.Object3D implements AbPrimitive {
 
   set lcsToWcs(lcsToWcs: THREE.Matrix4) {
     this.localBounds.matrix.copy(lcsToWcs);
-    this.localBounds.matrixWorldNeedsUpdate = true;
+    this.matrixWorldNeedsUpdate=true;
   }
 }
