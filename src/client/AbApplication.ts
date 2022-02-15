@@ -178,20 +178,20 @@ export class AbApplication {
     this.htmlElement.appendChild(this.stats.dom);
   }
 
-  createRandomSpheres(count: number = 5000) {
+  createRandomSpheres(count: number = 1000, maxRadius: number = 0.4) {
     for (var i = 0; i < count; ++i) {
       this.scene.addPrimitive(
         randomSphere(
           0.1,
-          0.2,
-          new THREE.Vector3(-5, 0, -5),
-          new THREE.Vector3(5, 2.5, 5)
+          maxRadius,
+          new THREE.Vector3(-5, 12.5, -5),
+          new THREE.Vector3(5, 15.0, 5)
         )
       );
     }
   }
 
-  createRandomCylinders(count: number = 5000) {
+  createRandomCylinders(count: number = 500) {
     for (var i = 0; i < count; ++i) {
       this.scene.addPrimitive(
         randomCylinderFinite(
@@ -204,7 +204,7 @@ export class AbApplication {
     }
   }
 
-  createRandomBounds(count: number = 5000) {
+  createRandomBounds(count: number = 500) {
     for (var i = 0; i < count; ++i) {
       this.scene.addPrimitive(
         randomBounds(
@@ -227,23 +227,51 @@ export class AbApplication {
   }
 
   createRegions() {
-    const boundaryPoints = [
-      new THREE.Vector2(0, 0),
-      new THREE.Vector2(1, 0),
-      new THREE.Vector2(1, 1),
-      new THREE.Vector2(0, 1),
-    ];
+    {
+      const boundaryPoints = [
+        new THREE.Vector2(0, 0),
+        new THREE.Vector2(1, 0),
+        new THREE.Vector2(1, 1),
+        new THREE.Vector2(0, 1),
+      ];
 
-    const hole = [
-      new THREE.Vector2(0.1, 0.1),
-      new THREE.Vector2(0.9, 0.1),
-      new THREE.Vector2(0.9, 0.9),
-      new THREE.Vector2(0.1, 0.9),
-    ];
+      const hole = [
+        new THREE.Vector2(0.1, 0.1),
+        new THREE.Vector2(0.9, 0.1),
+        new THREE.Vector2(0.9, 0.9),
+        new THREE.Vector2(0.1, 0.9),
+      ];
 
-    const region = new AbRegion(boundaryPoints, [hole]);
-    region.translateX(10);
-    this.scene.addPrimitive(region);
+      const region = new AbRegion(boundaryPoints, [hole]);
+      region.translateX(10);
+      this.scene.addPrimitive(region);
+    }
+    {
+      const boundaryPoints = [
+        new THREE.Vector2(0, 0),
+        new THREE.Vector2(1, 0),
+        new THREE.Vector2(0.5, 0.5),
+        new THREE.Vector2(1, 1),
+        new THREE.Vector2(0, 1),
+      ];
+
+      const hole1 = [
+        new THREE.Vector2(0.1, 0.1),
+        new THREE.Vector2(0.3, 0.1),
+        new THREE.Vector2(0.1, 0.3),
+      ];
+
+      const hole2 = [
+        new THREE.Vector2(0.4, 0.1),
+        new THREE.Vector2(0.6, 0.1),
+        new THREE.Vector2(0.4, 0.3),
+      ];
+
+      const region = new AbRegion(boundaryPoints, [hole1, hole2]);
+      region.translateX(6);
+
+      this.scene.addPrimitive(region);
+    }
   }
 
   createRandomCones(count: number = 500) {
@@ -265,20 +293,18 @@ export class AbApplication {
     const normals: number[] = [];
 
     const color = new THREE.Color();
+    const normal = new THREE.Vector3();
 
     for (let i = 0; i < numPoints; i++) {
       // positions
       const x = randomUniform(-10, 10);
-      const y = randomUniform(-10, 10);
+      const y = randomUniform(-10, 0);
       const z = randomUniform(-10, 10);
       positions.push(x, y, z);
 
       // normals
-      const nx = randomNormal();
-      const ny = randomNormal();
-      const nz = randomNormal();
-      const l = 1.0 / Math.sqrt(nx * nx + ny * ny + nz * nz);
-      normals.push(l * nx, l * ny, l * nz);
+      normal.copy(randomDirection());
+      normals.push(normal.x, normal.y, normal.z);
 
       // colors
       color.setRGB(Math.random(), Math.random(), Math.random());

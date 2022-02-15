@@ -1,11 +1,26 @@
-# typescript01
+# Getting started
 
-## Getting started
+For Front end development:
 
 ```
 npm install
-npm run build
-npm start
+npm run dev
 ```
 
-Open: http://localhost:3000
+To build frontend production bundle
+
+```
+npm run build
+```
+
+To build backend express server:
+
+```
+tsc -p ./src/server/
+```
+
+To run backend:
+
+```
+npm start
+```
