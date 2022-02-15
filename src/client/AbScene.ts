@@ -2,26 +2,9 @@ import * as THREE from "three";
 import { AbAxesHelper } from "./AbAxesHelper";
 import { AbPrimitive } from "./AbPrimitive";
 
-export class AbBounds3d extends THREE.Object3D implements AbPrimitive {
-  constructor(
-    public min: THREE.Vector3 = new THREE.Vector3(Infinity, Infinity, Infinity),
-    public max: THREE.Vector3 = new THREE.Vector3(
-      -Infinity,
-      -Infinity,
-      -Infinity
-    )
-  ) {
-    super();
-  }
-}
 
-export class AbBounds3dCs extends THREE.Object3D implements AbPrimitive {
-  constructor(
-    public localBounds: AbBounds3d //, //public localToWorld: THREE.Matrix4 = new THREE.Matrix4()
-  ) {
-    super();
-  }
-}
+
+
 
 export class AbScene {
   constructor(

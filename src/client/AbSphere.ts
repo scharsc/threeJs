@@ -11,18 +11,19 @@ export class AbSphere extends THREE.Object3D implements AbPrimitive {
       color: "rgb(255, 0, 0)",
     });
     this.mesh = new THREE.Mesh(AbSphere.geometry, this.material);
-    this.mesh.position.copy(center);
+    this.center_ = center;
     this.radius_ = radius;
-    this.mesh.scale.set(this.radius_, this.radius_, this.radius_);
+    this.updateMesh();
     this.add(this.mesh);
   }
 
   get center(): THREE.Vector3 {
-    return this.mesh.position;
+    return this.center_;
   }
 
   set center(value: THREE.Vector3) {
-    this.mesh.position.copy(value);
+    this.center_ =value;
+    this.updateMesh();
   }
 
   get radius(): number {
@@ -31,6 +32,12 @@ export class AbSphere extends THREE.Object3D implements AbPrimitive {
 
   set radius(value: number) {
     this.radius_ = value;
+    this.updateMesh();
+  }
+
+  private updateMesh()
+  {
+    this.mesh.position.copy(this.center_);
     this.mesh.scale.set(this.radius_, this.radius_, this.radius_);
   }
 
@@ -42,4 +49,5 @@ export class AbSphere extends THREE.Object3D implements AbPrimitive {
   material: THREE.MeshLambertMaterial;
   mesh: THREE.Mesh;
   private radius_: number;
+  private center_: THREE.Vector3;
 }

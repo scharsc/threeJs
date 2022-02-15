@@ -10,7 +10,7 @@ export class AbLineSegment extends THREE.Object3D implements AbPrimitive {
     }
   
     get center(): THREE.Vector3 {
-      return this.end.clone().sub(this.start).multiplyScalar(0.5).add(this.start);
+      return new THREE.Vector3().lerpVectors(this.start,this.end,0.5);
     }
   
     get height(): number {

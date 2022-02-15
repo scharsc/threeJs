@@ -1,6 +1,4 @@
 {
-    "cSpell.words": [
-        "raycaster",
-        "wireframe"
-    ]
+  "editor.formatOnSave": true,
+  "cSpell.words": ["raycaster", "wireframe", "lerp"]
 }
